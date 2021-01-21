@@ -1,4 +1,4 @@
-package com.example.QwikChat
+package com.techsauce.QwikChat
 
 import io.flutter.embedding.android.FlutterActivity
 

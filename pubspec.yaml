@@ -27,6 +27,12 @@ dependencies:
   redux: ^4.0.0+3
   flutter_redux: ^0.7.0
   flutter_spinkit: ^4.1.2+1
+  shared_preferences:
+
+  cloud_firestore: ^0.12.9+5    
+  firebase_auth: ^0.14.0+5
+  firebase_core: ^0.4.0+9
+  firebase_analytics: ^5.0.2
 
 
 
