@@ -1,7 +1,4 @@
-import 'dart:js';
-
 import 'package:QwikChat/pages/main_page.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class RouteGenerator {
@@ -18,6 +15,7 @@ class RouteGenerator {
                     child: Text("This is an error page"),
                   ),
                 ));
+        break;
     }
   }
 }

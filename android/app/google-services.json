@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "574130057245",
+    "firebase_url": "https://chat-app-b648e.firebaseio.com",
+    "project_id": "chat-app-b648e",
+    "storage_bucket": "chat-app-b648e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:574130057245:android:8cb5ea9af719f21dc916f4",
+        "android_client_info": {
+          "package_name": "com.techsauce.QwikChat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "574130057245-uucoatfn37vel3ejq5mc2pfghu2uk6nf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBh154EkyPrCB-REw8zx9CEOyKvEt0MCio"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "574130057245-uucoatfn37vel3ejq5mc2pfghu2uk6nf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
