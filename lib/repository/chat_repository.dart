@@ -1,41 +1,44 @@
 import 'package:QwikChat/interface/chat_repository_interface.dart';
-import '../model/chat_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../model/message_model.dart';
-import '../util/api.dart';
-import '../util/network.dart';
 
-class ChatRepository implements IChatRepositoryInterface {
-  @override
-  Future<List<MessageModel>> sendChat(
-      String token, MessageModel message) async {
-    String url = API.sendChatUrl;
-    Map<String, dynamic> data = await Network.callAPI(
-        url: url,
-        networkAction: NetworkAction.POST,
-        payload: {
-          "message": message,
-        });
+class ChatRepository {
+  // @override
 
-    if (data != null) {
-      return null;
-    }
-    return null;
+  Stream<QuerySnapshot> getChats() {
+    return Firestore.instance.collection("users").snapshots();
   }
 
-  @override
-  Future<List<MessageModel>> getChat(String token, int userId) async {
-    return null;
+  // // @override
+  sendChat(String chatId, MessageModel message) async {
+    Map<String, String> data = message.toMap();
+    return Firestore.instance
+        .collection("messages")
+        .document(chatId)
+        .collection("chats")
+        .add(data)
+        .catchError((e) {
+      print(e.toString());
+    });
   }
 
-  @override
-  Future<ChatModel> getChats(String token) async {
-    String url = API.getChatsUrl;
-    Map<String, dynamic> data = await Network.callAPI(
-        url: url, networkAction: NetworkAction.POST, token: token);
+  // // @override
+  Stream<QuerySnapshot> getChat(String chatId) {
+    return Firestore.instance
+        .collection("messages")
+        .document(chatId)
+        .collection("chats")
+        .orderBy("dateSent", descending: true)
+        .snapshots();
+  }
 
-    if (data != null) {
-      return null;
-    }
-    return null;
+  createChatRoom(String roomName, chatMap) {
+    Firestore.instance
+        .collection("chatRoom")
+        .document(roomName)
+        .setData(chatMap)
+        .catchError((e) {
+      print(e.toString());
+    });
   }
 }

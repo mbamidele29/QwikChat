@@ -40,13 +40,23 @@ class UserRepository implements UserRepositoryInterface {
     }
 
     if (user != null) {
-      await collectionReference.document(user.uid).setData({
-        "id": user.uid,
+      final Map<String, String> data = {
+        "uid": user.uid,
         "username": username,
         "email": email,
         "profilePicture": ""
-      });
-      return UserModel(id: user.uid, username: user.email, profilePicture: "");
+      };
+      final QuerySnapshot result = await Firestore.instance
+          .collection("users")
+          .where("uid", isEqualTo: user.uid)
+          .getDocuments();
+
+      final List<DocumentSnapshot> documents = result.documents;
+      if (documents.length == 0) {
+        Firestore.instance.collection("users").document(user.uid).setData(data);
+      }
+
+      return UserModel.fromJson(data);
     }
     return null;
   }
@@ -64,19 +74,29 @@ class UserRepository implements UserRepositoryInterface {
     }
 
     if (user != null) {
-      return UserModel(id: user.uid, username: user.email, profilePicture: "");
+      final QuerySnapshot result = await Firestore.instance
+          .collection("users")
+          .where("uid", isEqualTo: user.uid)
+          .getDocuments();
+
+      final List<DocumentSnapshot> documents = result.documents;
+      print(documents.toString());
+      return UserModel(
+          id: user.uid,
+          email: user.email,
+          username: user.email,
+          profilePicture: "");
     }
     return null;
   }
 
-  @override
-  Future<bool> signout(String token) async {
-    String url = API.logoutUrl;
-    Map<String, dynamic> data = await Network.callAPI(
-        url: url, networkAction: NetworkAction.POST, token: token);
+  Stream<QuerySnapshot> getUsers() {
+    return Firestore.instance.collection("users").snapshots();
+  }
 
-    if (data != null) {
-      return true;
-    }
+  @override
+  Future<bool> signout() async {
+    await _auth.signOut();
+    return true;
   }
 }

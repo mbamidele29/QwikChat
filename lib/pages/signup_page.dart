@@ -3,18 +3,19 @@ import 'package:QwikChat/util/color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-class MainPage extends StatefulWidget {
-  MainPage({Key key}) : super(key: key);
+class SignupPage extends StatefulWidget {
+  SignupPage({Key key}) : super(key: key);
 
   @override
-  _MainPageState createState() => _MainPageState();
+  _SignupPageState createState() => _SignupPageState();
 }
 
-class _MainPageState extends State<MainPage> {
+class _SignupPageState extends State<SignupPage> {
   bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
   final UserController userController = UserController();
   TextEditingController _emailController = TextEditingController();
+  TextEditingController _usernameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
   Future<void> checkStatus() async {
@@ -59,6 +60,17 @@ class _MainPageState extends State<MainPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
+                                      _text("USERNAME"),
+                                      _editText("username", _usernameController,
+                                          validator: (value) {
+                                        if (value.trim().length < 6)
+                                          return "minimum of 6 characters";
+                                        else
+                                          return null;
+                                      }),
+                                      SizedBox(
+                                        height: 40,
+                                      ),
                                       _text("EMAIL"),
                                       _editText(
                                         "Email",
@@ -93,73 +105,58 @@ class _MainPageState extends State<MainPage> {
                               width: MediaQuery.of(context).size.width,
                               child: Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 20),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    InkWell(
-                                      onTap: () {
-                                        Navigator.pushNamed(context, "/signup");
-                                      },
-                                      child: Text(
-                                        "Click to register",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () async {
-                                        if (_formKey.currentState.validate()) {
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      if (_formKey.currentState.validate()) {
+                                        setState(() {
+                                          isLoading = true;
+                                        });
+                                        bool result =
+                                            await userController.signup(
+                                                _usernameController.text.trim(),
+                                                _emailController.text.trim(),
+                                                _passwordController.text
+                                                    .trim());
+                                        if (result) {
                                           setState(() {
-                                            isLoading = true;
+                                            Navigator.pushReplacementNamed(
+                                                context, '/chats');
                                           });
-                                          bool result =
-                                              await userController.signin(
-                                                  _emailController.text.trim(),
-                                                  _passwordController.text
-                                                      .trim());
-                                          if (result) {
-                                            setState(() {
-                                              Navigator.pushReplacementNamed(
-                                                  context, '/chats');
-                                            });
-                                          } else {
-                                            Scaffold.of(ctx).showSnackBar(
-                                              SnackBar(
-                                                  content: Text(
-                                                "An error occurred",
-                                                style: TextStyle(
-                                                    color: Colors.red),
-                                              )),
-                                            );
-                                          }
-
-                                          setState(() {
-                                            isLoading = false;
-                                          });
+                                        } else {
+                                          Scaffold.of(ctx).showSnackBar(
+                                            SnackBar(
+                                                content: Text(
+                                              "An error occurred",
+                                              style:
+                                                  TextStyle(color: Colors.red),
+                                            )),
+                                          );
                                         }
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 15, vertical: 10),
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            border: Border.all(
-                                                width: 2, color: Colors.white)),
-                                        child: Text(
-                                          "Sign In",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w900),
-                                        ),
+
+                                        setState(() {
+                                          isLoading = false;
+                                        });
+                                      }
+                                    },
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 15, vertical: 10),
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border: Border.all(
+                                              width: 2, color: Colors.white)),
+                                      child: Text(
+                                        "Sign Up",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w900),
                                       ),
                                     ),
-                                  ],
+                                  ),
                                 ),
                               ),
                             ),

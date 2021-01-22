@@ -9,4 +9,12 @@ class UserModel {
 
   UserModel(
       {this.id, this.username, this.email, this.profilePicture, this.messages});
+
+  factory UserModel.fromJson(Map<String, String> json) {
+    return UserModel(
+        id: json["uid"],
+        username: json["username"],
+        profilePicture: json["profilePicture"],
+        messages: []);
+  }
 }
