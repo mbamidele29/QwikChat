@@ -1,6 +1,6 @@
 # QwikChat
 
-A new Flutter project.
+QwikChat is a firebase chat application which connects you to other registered users. It allows you to create groups and add other registered users into your group.
 
 ## Getting Started
 

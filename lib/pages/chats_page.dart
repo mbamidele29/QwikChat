@@ -1,8 +1,11 @@
 import 'package:QwikChat/controller/chat_controller.dart';
 import 'package:QwikChat/controller/user_controller.dart';
+import 'package:QwikChat/model/user_model.dart';
+import 'package:QwikChat/util/color.dart';
 import 'package:QwikChat/widgets/chat_list_item.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class ChatsPage extends StatefulWidget {
   @override
@@ -10,11 +13,37 @@ class ChatsPage extends StatefulWidget {
 }
 
 class _ChatsPageState extends State<ChatsPage> {
-  final UserController userController = UserController();
-  final ChatController chatController = ChatController();
+  UserController _userController;
+  ChatController _chatController;
+
+  UserModel _user;
+  Stream<QuerySnapshot> chats;
+
+  getChats({String email}) {
+    Stream<QuerySnapshot> ret = _chatController.getChats(email: email);
+    setState(() {
+      chats = ret;
+    });
+  }
+
+  setUp() async {
+    _userController = UserController();
+    UserModel user = await _userController.getUser();
+    setState(() {
+      _user = user;
+    });
+    _chatController = ChatController();
+  }
+
+  @override
+  void initState() {
+    setUp();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    getChats(email: _user.email);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -27,7 +56,7 @@ class _ChatsPageState extends State<ChatsPage> {
           IconButton(
               icon: Icon(Icons.logout),
               onPressed: () {
-                userController.signout();
+                _userController.signout();
                 Navigator.pushReplacementNamed(context, "/");
               }),
         ],
@@ -46,41 +75,58 @@ class _ChatsPageState extends State<ChatsPage> {
             stops: [0.6, 0.6],
           ),
         ),
-        child: StreamBuilder(
-            stream: chatController.getChats(),
-            builder: (ctx, snapshot) {
-              if (snapshot.hasData && snapshot.data.documents.length > 1) {
-                return Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ListView.builder(
-                      itemCount: snapshot.data.documents.length,
-                      itemBuilder: (ctx1, index) {
-                        DocumentSnapshot data = snapshot.data.documents[index];
-                        if (data["uid"] == userController.user.id)
-                          return SizedBox();
-                        else
+        child: _user == null
+            ? SpinKitCircle(
+                color: CustomColor.color1,
+              )
+            : StreamBuilder(
+                stream: chats,
+                builder: (ctx, snapshot) {
+                  if (snapshot.hasData && snapshot.data.documents.length > 0) {
+                    return Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: ListView.builder(
+                        itemCount: snapshot.data.documents.length,
+                        itemBuilder: (ctx1, index) {
+                          DocumentSnapshot data =
+                              snapshot.data.documents[index];
+                          String chatName = data["groupName"];
+                          List<dynamic> users = data["participants"];
+
+                          if (chatName == null || chatName.isEmpty) {
+                            if (users != null && users.length == 2) {
+                              for (dynamic item in users) {
+                                String email = _user.email ?? "";
+                                if (item.toString().compareTo(email) != 0)
+                                  chatName = item.toString();
+                              }
+                            }
+                          }
                           return ChatListItem(
+                            chatName: chatName,
                             document: data,
                             openChat: () {
                               Map<String, dynamic> map = {
-                                "uid": userController.user.id,
+                                "user": _user,
                                 "document": data,
                               };
                               Navigator.pushNamed(context, "/chat",
                                   arguments: map);
                             },
                           );
-                      }),
-                );
-              } else {
-                return Center(
-                  child: Text(
-                    "You are the only registered user",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                );
-              }
-            }),
+                        },
+                      ),
+                    );
+                  } else {
+                    return Center(
+                      child: Text(
+                        "Start chatting by clicking on the add button",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }
+                },
+              ),
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),

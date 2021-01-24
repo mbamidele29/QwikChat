@@ -1,6 +1,6 @@
 import 'package:QwikChat/controller/chat_controller.dart';
 import 'package:QwikChat/controller/user_controller.dart';
-import 'package:QwikChat/model/message_model.dart';
+import 'package:QwikChat/model/user_model.dart';
 import 'package:QwikChat/widgets/chat_item.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -26,21 +26,28 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, dynamic> data = ModalRoute.of(context).settings.arguments;
-    DocumentSnapshot document = data["document"];
+    Map<String, dynamic> arguments = ModalRoute.of(context).settings.arguments;
+    DocumentSnapshot document = arguments["document"];
 
-    String userId = data["uid"];
-    String chatId = "";
-    if (userId.compareTo(document["uid"].toString()) > 0) {
-      chatId = document["uid"].toString() + "_" + userId;
-    } else {
-      chatId = userId + "_" + document["uid"].toString();
+    String chatName = document["groupName"] ?? document["username"];
+    List<dynamic> users = document["participants"];
+    String chatId = document.documentID;
+    UserModel user = arguments["user"];
+
+    if (chatName == null || chatName.isEmpty) {
+      if (users != null && users.length == 2) {
+        for (dynamic item in users) {
+          if (item.toString().compareTo(user.username) != 0)
+            chatName = item.toString();
+        }
+      }
     }
+
     getChats(chatId);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Chat with ${data["document"]["username"]}"),
+        title: Text("Chat with $chatName"),
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,
@@ -63,9 +70,10 @@ class _ChatPageState extends State<ChatPage> {
                                 snapshot.data.documents[index];
                             return ChatItem(
                               index: index,
-                              myMessage:
-                                  data["userId"].toString().compareTo(userId) ==
-                                      0,
+                              myMessage: data["userId"]
+                                      .toString()
+                                      .compareTo(user.id) ==
+                                  0,
                               document: data,
                             );
                           });
@@ -107,12 +115,20 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                   ),
                   IconButton(
-                    // color: CustomColor.color1,
                     icon: Icon(Icons.send),
                     onPressed: () {
                       String message = _messageController.text.trim();
+                      List<dynamic> participants =
+                          users ?? [user.email, document["email"].toString()];
                       if (message.isNotEmpty) {
-                        chatController.sendMessage(userId, chatId, message);
+                        chatController.sendMessage(
+                          groupName: document["groupName"] ?? "",
+                          senderId: user.id,
+                          username: user.username,
+                          chatId: chatId,
+                          participants: participants,
+                          message: message,
+                        );
                         _messageController.clear();
                       }
                     },

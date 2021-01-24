@@ -1,9 +1,8 @@
 import 'package:QwikChat/interface/user_repository_interface.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../model/user_model.dart';
-import '../util/api.dart';
-import '../util/network.dart';
 
 class UserRepository implements UserRepositoryInterface {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -34,8 +33,7 @@ class UserRepository implements UserRepositoryInterface {
               email: email, password: password))
           .user;
     } catch (e) {
-      print("DDDDDDDDDDD");
-      print(e);
+      Fluttertoast.showToast(msg: e.toString());
       return null;
     }
 
@@ -69,7 +67,7 @@ class UserRepository implements UserRepositoryInterface {
               email: email, password: password))
           .user;
     } catch (e) {
-      print(e);
+      Fluttertoast.showToast(msg: e.toString());
       return null;
     }
 
@@ -80,7 +78,6 @@ class UserRepository implements UserRepositoryInterface {
           .getDocuments();
 
       final List<DocumentSnapshot> documents = result.documents;
-      print(documents.toString());
       return UserModel(
           id: user.uid,
           email: user.email,
@@ -90,8 +87,16 @@ class UserRepository implements UserRepositoryInterface {
     return null;
   }
 
-  Stream<QuerySnapshot> getUsers() {
-    return Firestore.instance.collection("users").snapshots();
+  @override
+  Stream<QuerySnapshot> getUsers({String username = ""}) {
+    if (username == null || username.isEmpty) {
+      return Firestore.instance.collection("users").snapshots();
+    } else {
+      return Firestore.instance
+          .collection("users")
+          .where("username", isEqualTo: username.trim())
+          .snapshots();
+    }
   }
 
   @override

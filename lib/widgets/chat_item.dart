@@ -10,13 +10,14 @@ class ChatItem extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
+    String username = document["username"] ?? "";
+
     return Container(
       padding: myMessage
           ? EdgeInsets.only(right: 30, top: 10, bottom: 10)
           : EdgeInsets.only(left: 30, top: 10, bottom: 10),
       child: Align(
         alignment: (myMessage ? Alignment.topRight : Alignment.topLeft),
-        // alignment: (messages[index].messageType == "receiver"?Alignment.topLeft:Alignment.topRight),
         child: Container(
             decoration: BoxDecoration(
               borderRadius: myMessage
@@ -29,7 +30,6 @@ class ChatItem extends StatelessWidget {
                       topRight: Radius.circular(20),
                       bottomRight: Radius.circular(20)),
               color: (myMessage ? Colors.blue[200] : Colors.grey.shade200),
-              // color: (messages[index].messageType  == "receiver"?Colors.grey.shade200:Colors.blue[200]),
             ),
             padding: EdgeInsets.all(16),
             child: Column(
@@ -37,6 +37,12 @@ class ChatItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisSize: MainAxisSize.max,
               children: [
+                (!myMessage && username != null && username.isNotEmpty)
+                    ? Text(
+                        username,
+                        style: TextStyle(fontSize: 12),
+                      )
+                    : SizedBox.shrink(),
                 Text(
                   document["message"],
                   style: TextStyle(fontSize: 15),

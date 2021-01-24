@@ -1,5 +1,6 @@
 import 'package:QwikChat/pages/chat_page.dart';
 import 'package:QwikChat/pages/chats_page.dart';
+import 'package:QwikChat/pages/create_group_page.dart';
 import 'package:QwikChat/pages/error_page.dart';
 import 'package:QwikChat/pages/main_page.dart';
 import 'package:QwikChat/pages/signup_page.dart';
@@ -17,14 +18,18 @@ class RouteGenerator {
         return MaterialPageRoute(builder: (context) => SignupPage());
         break;
       case '/chats':
-        return MaterialPageRoute(builder: (context) => ChatsPage());
-        break;
-      case '/users':
-        return MaterialPageRoute(builder: (context) => UsersPage());
+        return MaterialPageRoute(
+            settings: settings, builder: (context) => ChatsPage());
         break;
       case '/chat':
         return MaterialPageRoute(
             settings: settings, builder: (context) => ChatPage());
+        break;
+      case '/users':
+        return MaterialPageRoute(builder: (context) => UsersPage());
+        break;
+      case '/create_group':
+        return MaterialPageRoute(builder: (context) => CreateGroupPage());
         break;
       default:
         return MaterialPageRoute(builder: (context) => ErrorPage());

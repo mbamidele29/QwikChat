@@ -13,18 +13,24 @@ class SignupPage extends StatefulWidget {
 class _SignupPageState extends State<SignupPage> {
   bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
-  final UserController userController = UserController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _usernameController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  UserController _userController;
+  TextEditingController _emailController;
+  TextEditingController _usernameController;
+  TextEditingController _passwordController;
 
   Future<void> checkStatus() async {
-    bool status = await userController.isUserLoggedin();
+    bool status = await _userController.getUser() != null;
     if (status) Navigator.pushReplacementNamed(context, '/chats');
   }
 
   @override
   void initState() {
+    _userController = UserController();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+    _usernameController = TextEditingController();
+
+    // check if user is logged in
     checkStatus();
     super.initState();
   }
@@ -114,7 +120,7 @@ class _SignupPageState extends State<SignupPage> {
                                           isLoading = true;
                                         });
                                         bool result =
-                                            await userController.signup(
+                                            await _userController.signup(
                                                 _usernameController.text.trim(),
                                                 _emailController.text.trim(),
                                                 _passwordController.text
@@ -124,15 +130,6 @@ class _SignupPageState extends State<SignupPage> {
                                             Navigator.pushReplacementNamed(
                                                 context, '/chats');
                                           });
-                                        } else {
-                                          Scaffold.of(ctx).showSnackBar(
-                                            SnackBar(
-                                                content: Text(
-                                              "An error occurred",
-                                              style:
-                                                  TextStyle(color: Colors.red),
-                                            )),
-                                          );
                                         }
 
                                         setState(() {

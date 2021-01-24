@@ -1,5 +1,6 @@
 import 'package:QwikChat/controller/user_controller.dart';
-import 'package:QwikChat/widgets/chat_list_item.dart';
+import 'package:QwikChat/model/user_model.dart';
+import 'package:QwikChat/widgets/user_list_item.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +10,22 @@ class UsersPage extends StatefulWidget {
 }
 
 class _UsersPageState extends State<UsersPage> {
-  final UserController userController = UserController();
+  UserController _userController;
+  UserModel _user;
+
+  setUp() async {
+    _userController = UserController();
+    UserModel user = await _userController.getUser();
+    setState(() {
+      _user = user;
+    });
+  }
+
+  @override
+  void initState() {
+    setUp();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,10 +39,12 @@ class _UsersPageState extends State<UsersPage> {
         ),
         actions: [
           IconButton(
-              icon: Icon(Icons.logout),
+              icon: Icon(
+                Icons.add,
+                semanticLabel: "create Group",
+              ),
               onPressed: () {
-                userController.signout();
-                Navigator.pushReplacementNamed(context, "/");
+                Navigator.pushNamed(context, "/create_group");
               }),
         ],
       ),
@@ -45,7 +63,7 @@ class _UsersPageState extends State<UsersPage> {
           ),
         ),
         child: StreamBuilder(
-            stream: userController.getUsers(),
+            stream: _userController.getUsers(),
             builder: (ctx, snapshot) {
               if (snapshot.hasData && snapshot.data.documents.length > 1) {
                 return Padding(
@@ -54,14 +72,14 @@ class _UsersPageState extends State<UsersPage> {
                       itemCount: snapshot.data.documents.length,
                       itemBuilder: (ctx1, index) {
                         DocumentSnapshot data = snapshot.data.documents[index];
-                        if (data["uid"] == userController.user.id)
+                        if (data["uid"] == _user.id)
                           return SizedBox();
                         else
-                          return ChatListItem(
+                          return UserListItem(
                             document: data,
                             openChat: () {
                               Map<String, dynamic> map = {
-                                "uid": userController.user.id,
+                                "user": _user,
                                 "document": data,
                               };
                               Navigator.pushNamed(context, "/chat",

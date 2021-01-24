@@ -13,17 +13,22 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
-  final UserController userController = UserController();
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  UserController _userController;
+  TextEditingController _emailController;
+  TextEditingController _passwordController;
 
   Future<void> checkStatus() async {
-    bool status = await userController.isUserLoggedin();
+    bool status = await _userController.getUser() != null;
     if (status) Navigator.pushReplacementNamed(context, '/chats');
   }
 
   @override
   void initState() {
+    _userController = UserController();
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+
+    // check if user is logged in
     checkStatus();
     super.initState();
   }
@@ -117,7 +122,7 @@ class _MainPageState extends State<MainPage> {
                                             isLoading = true;
                                           });
                                           bool result =
-                                              await userController.signin(
+                                              await _userController.signin(
                                                   _emailController.text.trim(),
                                                   _passwordController.text
                                                       .trim());
@@ -126,15 +131,6 @@ class _MainPageState extends State<MainPage> {
                                               Navigator.pushReplacementNamed(
                                                   context, '/chats');
                                             });
-                                          } else {
-                                            Scaffold.of(ctx).showSnackBar(
-                                              SnackBar(
-                                                  content: Text(
-                                                "An error occurred",
-                                                style: TextStyle(
-                                                    color: Colors.red),
-                                              )),
-                                            );
                                           }
 
                                           setState(() {

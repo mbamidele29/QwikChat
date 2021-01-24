@@ -1,23 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class ChatListItem extends StatelessWidget {
+class UserListItem extends StatelessWidget {
   final DocumentSnapshot document;
   final Function openChat;
-  final String chatName;
-  final String lastChat;
-  final String lastChatTime;
+  final bool addedToGroup;
 
-  const ChatListItem(
-      {Key key,
-      @required this.document,
-      @required this.openChat,
-      @required this.chatName,
-      this.lastChat = "",
-      this.lastChatTime = ""})
+  const UserListItem(
+      {Key key, this.document, this.openChat, this.addedToGroup = false})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
+    String chatName = document['username'];
     return Container(
       child: Column(
         children: [
@@ -55,25 +49,26 @@ class ChatListItem extends StatelessWidget {
                           style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 18,
+                            fontSize: 16,
                             letterSpacing: 1,
                           ),
                         ),
                         SizedBox(
                           height: 6,
                         ),
-                        lastChat.isNotEmpty
-                            ? Text(
-                                lastChat,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  letterSpacing: .5,
-                                ),
-                              )
-                            : SizedBox.shrink()
+                        Text(
+                          document['email'] ?? "",
+                          style: TextStyle(
+                            color: Colors.white,
+                            letterSpacing: .5,
+                          ),
+                        ),
                       ],
                     ),
-                  )
+                  ),
+                  addedToGroup
+                      ? Icon(Icons.radio_button_checked_outlined)
+                      : SizedBox.shrink(),
                 ],
               ),
             ),
