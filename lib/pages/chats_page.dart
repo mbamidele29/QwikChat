@@ -55,8 +55,8 @@ class _ChatsPageState extends State<ChatsPage> {
         actions: [
           IconButton(
               icon: Icon(Icons.logout),
-              onPressed: () {
-                _userController.signout();
+              onPressed: () async {
+                await _userController.signout();
                 Navigator.pushReplacementNamed(context, "/");
               }),
         ],
@@ -91,6 +91,8 @@ class _ChatsPageState extends State<ChatsPage> {
                           DocumentSnapshot data =
                               snapshot.data.documents[index];
                           String chatName = data["groupName"];
+                          String lastMessageFrom =
+                              data["lastMessageFrom"] ?? "";
                           List<dynamic> users = data["participants"];
 
                           if (chatName == null || chatName.isEmpty) {
@@ -105,6 +107,8 @@ class _ChatsPageState extends State<ChatsPage> {
                           return ChatListItem(
                             chatName: chatName,
                             document: data,
+                            newMessages:
+                                lastMessageFrom.compareTo(_user.email) != 0,
                             openChat: () {
                               Map<String, dynamic> map = {
                                 "user": _user,

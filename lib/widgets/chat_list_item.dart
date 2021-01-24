@@ -1,3 +1,4 @@
+import 'package:QwikChat/util/color.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -7,15 +8,17 @@ class ChatListItem extends StatelessWidget {
   final String chatName;
   final String lastChat;
   final String lastChatTime;
+  final bool newMessages;
 
-  const ChatListItem(
-      {Key key,
-      @required this.document,
-      @required this.openChat,
-      @required this.chatName,
-      this.lastChat = "",
-      this.lastChatTime = ""})
-      : super(key: key);
+  const ChatListItem({
+    Key key,
+    @required this.document,
+    @required this.openChat,
+    @required this.chatName,
+    this.lastChat = "",
+    this.lastChatTime = "",
+    this.newMessages = false,
+  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -73,7 +76,23 @@ class ChatListItem extends StatelessWidget {
                             : SizedBox.shrink()
                       ],
                     ),
-                  )
+                  ),
+                  newMessages
+                      ? Container(
+                          padding: EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            color: CustomColor.color1,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(
+                            "NEW",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
+                          ),
+                        )
+                      : SizedBox.shrink(),
                 ],
               ),
             ),

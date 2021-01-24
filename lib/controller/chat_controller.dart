@@ -16,7 +16,7 @@ class ChatController {
 
   sendMessage(
       {@required String senderId,
-      @required String username,
+      @required String email,
       @required String chatId,
       @required String groupName,
       @required List<dynamic> participants,
@@ -25,12 +25,13 @@ class ChatController {
 
     Map<String, dynamic> payload = {
       "groupName": groupName,
+      "lastMessageFrom": email,
       "dateSent": now.toString(),
       "participants": participants,
     };
     MessageModel obj = MessageModel(
         userId: senderId,
-        username: participants.length > 2 ? username : "",
+        email: participants.length > 2 ? email : "",
         message: message,
         dateSent: now.toString());
     return _chatRepository.sendChat(chatId, payload, obj);

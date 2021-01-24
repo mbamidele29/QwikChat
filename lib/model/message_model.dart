@@ -1,16 +1,16 @@
 class MessageModel {
   String userId;
-  String username;
+  String email;
   String message;
   String dateSent;
   MessageStatus status;
 
   MessageModel(
-      {this.userId, this.username, this.message, this.dateSent, this.status});
+      {this.userId, this.email, this.message, this.dateSent, this.status});
   Map<String, String> toMap() {
     return {
       "userId": this.userId,
-      "username": this.username,
+      "email": this.email,
       "message": this.message,
       "dateSent": this.dateSent,
     };

@@ -43,6 +43,10 @@ class _ChatPageState extends State<ChatPage> {
       }
     }
 
+    if (users != null && users.length > 2) {
+      chatName = "$chatName - ${users.length} participants";
+    }
+
     getChats(chatId);
 
     return Scaffold(
@@ -124,7 +128,7 @@ class _ChatPageState extends State<ChatPage> {
                         chatController.sendMessage(
                           groupName: document["groupName"] ?? "",
                           senderId: user.id,
-                          username: user.username,
+                          email: user.email,
                           chatId: chatId,
                           participants: participants,
                           message: message,

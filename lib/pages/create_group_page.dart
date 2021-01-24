@@ -47,7 +47,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
     if (!addedUsers.containsKey(_user.id)) participants.add(_user.email);
     _chatController.sendMessage(
       senderId: _user.id,
-      username: _user.username,
+      email: _user.username,
       chatId: chatId,
       groupName: groupName,
       participants: participants,

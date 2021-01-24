@@ -4,7 +4,10 @@ QwikChat is a firebase chat application which connects you to other registered u
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project is a starting point for a Flutter Firebase chat application. 
+
+Run flutter pub get to install dependencies.
+Run flutter run to build app on your device.
 
 A few resources to get you started if this is your first Flutter project:
 
