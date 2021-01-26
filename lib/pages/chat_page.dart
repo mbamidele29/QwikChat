@@ -31,7 +31,7 @@ class _ChatPageState extends State<ChatPage> {
 
     String chatName = document["groupName"] ?? document["username"];
     List<dynamic> users = document["participants"];
-    String chatId = document.documentID;
+    String chatId = arguments["chatId"];
     UserModel user = arguments["user"];
 
     if (chatName == null || chatName.isEmpty) {

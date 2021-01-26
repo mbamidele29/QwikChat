@@ -111,6 +111,7 @@ class _ChatsPageState extends State<ChatsPage> {
                                 lastMessageFrom.compareTo(_user.email) != 0,
                             openChat: () {
                               Map<String, dynamic> map = {
+                                "chatId": data.documentID,
                                 "user": _user,
                                 "document": data,
                               };

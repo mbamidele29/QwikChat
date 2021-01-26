@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 class ChatItem extends StatelessWidget {
   final int index;
@@ -11,6 +12,7 @@ class ChatItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String username = document["username"] ?? "";
+    DateTime date = DateTime.parse(document["dateSent"]);
 
     return Container(
       padding: myMessage
@@ -48,10 +50,10 @@ class ChatItem extends StatelessWidget {
                   style: TextStyle(fontSize: 15),
                 ),
                 SizedBox(
-                  height: 5,
+                  height: 8,
                 ),
                 Text(
-                  document["dateSent"],
+                  timeago.format(date),
                   style: TextStyle(fontSize: 12),
                 ),
               ],

@@ -37,16 +37,6 @@ class _UsersPageState extends State<UsersPage> {
             color: Colors.white,
           ),
         ),
-        actions: [
-          IconButton(
-              icon: Icon(
-                Icons.add,
-                semanticLabel: "create Group",
-              ),
-              onPressed: () {
-                Navigator.pushNamed(context, "/create_group");
-              }),
-        ],
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,
@@ -66,28 +56,33 @@ class _UsersPageState extends State<UsersPage> {
             stream: _userController.getUsers(),
             builder: (ctx, snapshot) {
               if (snapshot.hasData && snapshot.data.documents.length > 1) {
-                return Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ListView.builder(
-                      itemCount: snapshot.data.documents.length,
-                      itemBuilder: (ctx1, index) {
-                        DocumentSnapshot data = snapshot.data.documents[index];
-                        if (data["uid"] == _user.id)
-                          return SizedBox();
-                        else
-                          return UserListItem(
-                            document: data,
-                            openChat: () {
-                              Map<String, dynamic> map = {
-                                "user": _user,
-                                "document": data,
-                              };
-                              Navigator.pushNamed(context, "/chat",
-                                  arguments: map);
-                            },
-                          );
-                      }),
-                );
+                return ListView.builder(
+                    itemCount: snapshot.data.documents.length,
+                    itemBuilder: (ctx1, index) {
+                      DocumentSnapshot data = snapshot.data.documents[index];
+                      if (data["uid"] == _user.id)
+                        return SizedBox();
+                      else {
+                        String chatId = "";
+                        if (_user.id.compareTo(data["uid"].toString()) > 0) {
+                          chatId = data["uid"].toString() + "_" + _user.id;
+                        } else {
+                          chatId = _user.id + "_" + data["uid"].toString();
+                        }
+                        return UserListItem(
+                          document: data,
+                          openChat: () {
+                            Map<String, dynamic> map = {
+                              "chatId": chatId,
+                              "user": _user,
+                              "document": data,
+                            };
+                            Navigator.pushNamed(context, "/chat",
+                                arguments: map);
+                          },
+                        );
+                      }
+                    });
               } else {
                 return Center(
                   child: Text(
@@ -97,6 +92,12 @@ class _UsersPageState extends State<UsersPage> {
                 );
               }
             }),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, "/create_group");
+        },
+        child: Icon(Icons.people),
       ),
     );
   }

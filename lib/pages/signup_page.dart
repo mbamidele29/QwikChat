@@ -73,32 +73,39 @@ class _SignupPageState extends State<SignupPage> {
                                           return "minimum of 6 characters";
                                         else
                                           return null;
-                                      }),
+                                      }, enabled: !isLoading),
                                       SizedBox(
                                         height: 40,
                                       ),
                                       _text("EMAIL"),
-                                      _editText(
-                                        "Email",
-                                        _emailController,
-                                        validator: (value) {
-                                          if (value.trim().isEmpty)
-                                            return "Email is required";
-                                          else
-                                            return null;
-                                        },
-                                      ),
+                                      _editText("Email", _emailController,
+                                          validator: (value) {
+                                        String email = value.trim();
+                                        if (email.isEmpty)
+                                          return "Email is required";
+                                        bool emailValid = RegExp(
+                                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                            .hasMatch(email);
+                                        if (!emailValid)
+                                          return "Value must be an email address";
+                                        return null;
+                                      }, enabled: !isLoading),
                                       SizedBox(
                                         height: 40,
                                       ),
                                       _text("PASSWORD"),
-                                      _editText("password", _passwordController,
-                                          validator: (value) {
-                                        if (value.length < 6)
-                                          return "minimum of 6 characters";
-                                        else
-                                          return null;
-                                      }, obscureText: true),
+                                      _editText(
+                                        "password",
+                                        _passwordController,
+                                        validator: (value) {
+                                          if (value.length < 6)
+                                            return "minimum of 6 characters";
+                                          else
+                                            return null;
+                                        },
+                                        enabled: !isLoading,
+                                        obscureText: true,
+                                      ),
                                       SizedBox(
                                         height: 40,
                                       ),
@@ -115,26 +122,26 @@ class _SignupPageState extends State<SignupPage> {
                                   alignment: Alignment.centerRight,
                                   child: GestureDetector(
                                     onTap: () async {
-                                      if (_formKey.currentState.validate()) {
-                                        setState(() {
-                                          isLoading = true;
-                                        });
-                                        bool result =
-                                            await _userController.signup(
-                                                _usernameController.text.trim(),
-                                                _emailController.text.trim(),
-                                                _passwordController.text
-                                                    .trim());
-                                        if (result) {
+                                      if (!isLoading) {
+                                        if (_formKey.currentState.validate()) {
                                           setState(() {
-                                            Navigator.pushReplacementNamed(
-                                                context, '/chats');
+                                            isLoading = true;
                                           });
-                                        }
+                                          bool result =
+                                              await _userController.signup(
+                                            _usernameController.text.trim(),
+                                            _emailController.text.trim(),
+                                            _passwordController.text.trim(),
+                                          );
 
-                                        setState(() {
-                                          isLoading = false;
-                                        });
+                                          setState(() {
+                                            isLoading = false;
+                                          });
+
+                                          if (result) {
+                                            Navigator.pop(context);
+                                          }
+                                        }
                                       }
                                     },
                                     child: Container(
@@ -187,8 +194,9 @@ class _SignupPageState extends State<SignupPage> {
 }
 
 Widget _editText(final String hintText, TextEditingController controller,
-    {bool obscureText = false, Function validator}) {
+    {bool obscureText = false, bool enabled = true, Function validator}) {
   return TextFormField(
+    enabled: enabled,
     controller: controller,
     obscureText: obscureText,
     validator: validator,

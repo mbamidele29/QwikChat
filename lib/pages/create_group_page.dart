@@ -29,8 +29,8 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
   }
 
   Stream<QuerySnapshot> _users;
-  searchUsername(String username) {
-    Stream<QuerySnapshot> ret = _userController.getUsers(username: username);
+  getUsers() {
+    Stream<QuerySnapshot> ret = _userController.getUsers();
     setState(() {
       _users = ret;
     });
@@ -60,6 +60,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
   @override
   void initState() {
     setUp();
+    getUsers();
     super.initState();
   }
 
@@ -73,21 +74,6 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
             color: Colors.white,
           ),
         ),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () {
-                String groupName = _groupNameController.text.trim();
-                if (groupName.isEmpty) {
-                  Fluttertoast.showToast(msg: "Group name cannot be empty");
-                } else {
-                  String chatId = _user.id +
-                      groupName.replaceAll(" ", "_").replaceAll("-", "_");
-                  createGroup(
-                      context: ctx, groupName: groupName, chatId: chatId);
-                }
-              }),
-        ],
       ),
       body: Container(
         width: MediaQuery.of(ctx).size.width,
@@ -112,7 +98,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    offset: Offset(0, 1.5),
+                    offset: Offset(0, 3),
                     color: Colors.grey,
                     blurRadius: 3,
                   )
@@ -120,21 +106,28 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
               ),
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               child: TextField(
-                onChanged: (username) {
-                  if (username.trim().isNotEmpty) searchUsername(username);
-                },
+                controller: _groupNameController,
                 decoration: InputDecoration(
-                  hintText: "Search username",
+                  hintText: "Enter Group Name",
                   border: UnderlineInputBorder(borderSide: BorderSide.none),
                 ),
               ),
             ),
+            SizedBox(
+              height: 10,
+            ),
             Container(
+              width: double.infinity,
+              margin: EdgeInsets.symmetric(horizontal: 10),
               padding: EdgeInsets.symmetric(vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(20),
+              ),
               child: Text(
                 (addedUsers.length == 0 || addedUsers.length > 1)
-                    ? "${addedUsers.length} users added"
-                    : "${addedUsers.length} user added",
+                    ? "${addedUsers.length} participants added"
+                    : "${addedUsers.length} participant added",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
@@ -148,14 +141,15 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                   builder: (ctx, snapshot) {
                     if (snapshot.hasData &&
                         snapshot.data.documents.length > 0) {
-                      return Padding(
-                        padding: const EdgeInsets.all(10.0),
-                        child: ListView.builder(
-                            itemCount: snapshot.data.documents.length,
-                            itemBuilder: (ctx1, index) {
-                              DocumentSnapshot data =
-                                  snapshot.data.documents[index];
-                              String userId = data["uid"];
+                      return ListView.builder(
+                          itemCount: snapshot.data.documents.length,
+                          itemBuilder: (ctx1, index) {
+                            DocumentSnapshot data =
+                                snapshot.data.documents[index];
+                            String userId = data["uid"];
+                            if (userId == _user.id)
+                              return SizedBox();
+                            else
                               return UserListItem(
                                 document: data,
                                 addedToGroup: addedUsers.containsKey(userId),
@@ -172,8 +166,7 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                                   });
                                 },
                               );
-                            }),
-                      );
+                          });
                     } else {
                       return Center(
                         child: Text(
@@ -184,29 +177,25 @@ class _CreateGroupPageState extends State<CreateGroupPage> {
                     }
                   }),
             ),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    offset: Offset(0, 1.5),
-                    color: Colors.grey,
-                    blurRadius: 3,
-                  )
-                ],
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              child: TextField(
-                controller: _groupNameController,
-                decoration: InputDecoration(
-                  hintText: "Enter Group Name",
-                  border: UnderlineInputBorder(borderSide: BorderSide.none),
-                ),
-              ),
-            ),
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.arrow_forward),
+          onPressed: () {
+            String groupName = _groupNameController.text.trim();
+            if (groupName.isEmpty) {
+              Fluttertoast.showToast(msg: "Group name cannot be empty");
+              return;
+            }
+            if (addedUsers.length < 1) {
+              Fluttertoast.showToast(msg: "Group participants cannot be empty");
+              return;
+            }
+            String chatId =
+                _user.id + groupName.replaceAll(" ", "_").replaceAll("-", "_");
+            createGroup(context: ctx, groupName: groupName, chatId: chatId);
+          }),
     );
   }
 }

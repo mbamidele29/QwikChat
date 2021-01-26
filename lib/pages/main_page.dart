@@ -65,27 +65,34 @@ class _MainPageState extends State<MainPage> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       _text("EMAIL"),
-                                      _editText(
-                                        "Email",
-                                        _emailController,
-                                        validator: (value) {
-                                          if (value.trim().isEmpty)
-                                            return "Email is required";
-                                          else
-                                            return null;
-                                        },
-                                      ),
+                                      _editText("Email", _emailController,
+                                          validator: (value) {
+                                        String email = value.trim();
+                                        if (email.isEmpty)
+                                          return "Email is required";
+                                        bool emailValid = RegExp(
+                                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                            .hasMatch(email);
+                                        if (!emailValid)
+                                          return "Value must be an email address";
+                                        return null;
+                                      }, enabled: !isLoading),
                                       SizedBox(
                                         height: 40,
                                       ),
                                       _text("PASSWORD"),
-                                      _editText("password", _passwordController,
-                                          validator: (value) {
-                                        if (value.length < 6)
-                                          return "minimum of 6 characters";
-                                        else
-                                          return null;
-                                      }, obscureText: true),
+                                      _editText(
+                                        "password",
+                                        _passwordController,
+                                        validator: (value) {
+                                          if (value.length < 6)
+                                            return "minimum of 6 characters";
+                                          else
+                                            return null;
+                                        },
+                                        obscureText: true,
+                                        enabled: !isLoading,
+                                      ),
                                       SizedBox(
                                         height: 40,
                                       ),
@@ -117,25 +124,27 @@ class _MainPageState extends State<MainPage> {
                                     ),
                                     GestureDetector(
                                       onTap: () async {
-                                        if (_formKey.currentState.validate()) {
-                                          setState(() {
-                                            isLoading = true;
-                                          });
-                                          bool result =
-                                              await _userController.signin(
-                                                  _emailController.text.trim(),
-                                                  _passwordController.text
-                                                      .trim());
-                                          if (result) {
+                                        if (!isLoading) {
+                                          if (_formKey.currentState
+                                              .validate()) {
                                             setState(() {
+                                              isLoading = true;
+                                            });
+                                            bool result =
+                                                await _userController.signin(
+                                                    _emailController.text
+                                                        .trim(),
+                                                    _passwordController.text
+                                                        .trim());
+                                            if (result) {
                                               Navigator.pushReplacementNamed(
                                                   context, '/chats');
+                                            }
+
+                                            setState(() {
+                                              isLoading = false;
                                             });
                                           }
-
-                                          setState(() {
-                                            isLoading = false;
-                                          });
                                         }
                                       },
                                       child: Container(
@@ -189,8 +198,9 @@ class _MainPageState extends State<MainPage> {
 }
 
 Widget _editText(final String hintText, TextEditingController controller,
-    {bool obscureText = false, Function validator}) {
+    {bool obscureText = false, bool enabled = true, Function validator}) {
   return TextFormField(
+    enabled: enabled,
     controller: controller,
     obscureText: obscureText,
     validator: validator,

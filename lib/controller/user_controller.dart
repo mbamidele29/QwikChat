@@ -20,7 +20,6 @@ class UserController {
     UserModel user = await _userRepository.signup(username, email, password);
 
     if (user != null) {
-      _preference.setUser(user);
       return true;
     } else
       return false;
