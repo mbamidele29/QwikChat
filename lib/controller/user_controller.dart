@@ -2,6 +2,7 @@ import 'package:QwikChat/model/user_model.dart';
 import 'package:QwikChat/repository/user_repository.dart';
 import 'package:QwikChat/util/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class UserController {
   UserRepository _userRepository;
@@ -20,6 +21,7 @@ class UserController {
     UserModel user = await _userRepository.signup(username, email, password);
 
     if (user != null) {
+      Fluttertoast.showToast(msg: "account has been created, please sign in");
       return true;
     } else
       return false;
