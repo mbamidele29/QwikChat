@@ -15,6 +15,8 @@ Run flutter run to build app on your device.
 flutter run
 ```
 
+- [Download link](https://drive.google.com/file/d/1wPgc8ERxZRcpubRvJoXQ6yao8vzIv16F/view?usp=sharing)
+
 A few resources to get you started if this is your first Flutter project:
 
 - [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
